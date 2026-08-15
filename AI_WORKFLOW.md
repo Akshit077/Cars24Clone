@@ -1,0 +1,70 @@
+# AI workflow
+
+How this SDUI system was built with AI. Append entries as work happens — do not reconstruct prompts after the fact.
+
+## Tool stack
+
+| Tool | Role |
+|---|---|
+| Cursor (Grok 4.6) | Design, implementation, docs |
+| Android Studio | Run, Layout Inspector, release builds, profiling |
+| Cars24 consumer app | Visual reference for the home/landing screen |
+
+## Context / rules files I wrote to brief the model
+
+These exist before any renderer code on purpose. The assignment scores the brief, not just the output.
+
+| File | Scope |
+|---|---|
+| `.cursor/rules/sdui-invariants.mdc` | Always on: primitives only, JSON-driven actions, fallback, one stack |
+| `.cursor/rules/kotlin-sdui.mdc` | `**/*.kt` — package map, registry, dispatcher, Coil |
+| `.cursor/rules/sdui-json-schema.mdc` | JSON / `schema.md` — document shape, actions, no page-specific types |
+| `.cursor/rules/assignment-docs.mdc` | Submission markdown honesty |
+
+## Verification strategy for AI-generated code
+
+1. Read the diff. Reject any new registry type whose name describes a Cars24 marketing section.
+2. Compile (`./gradlew :app:assembleDebug`) after dependency or source changes.
+3. Unit-test JSON decode + unknown-type fallback (no crash, fallback node present).
+4. Manual: render `home.json`, flip a chip, open the sheet, load `home_unknown_type.json`.
+5. Perf numbers only from a **release** build on a real device. Do not accept model-invented timings.
+
+---
+
+## Prompt → outcome stories
+
+### 1. Hour 0 setup (2026-08-15)
+
+**Prompt (abridged):** Help with `0:00–0:30` — init git, add kotlinx.serialization + Coil, write Cursor rules, start `AI_WORKFLOW.md`. Project already exists as `Cars24Clone`.
+
+**What the model produced:**
+
+- Version catalog + Gradle plugin wiring for `kotlinx-serialization-json` and Coil 3
+- `INTERNET` permission
+- Four `.cursor/rules/*.mdc` files
+- This log, a thin `README.md`, `git init`
+
+**What I accepted:** The split of rules (always-on invariants vs Kotlin vs JSON vs docs). Starting this file in hour 0. Coil 3 + OkHttp network fetcher instead of Coil 2.
+
+**What I will watch / may rewrite later:**
+
+- Serialization runtime is `1.10.0` (fits Kotlin `2.2.10`) rather than `1.11.0` (defaults to Kotlin 2.3). If the compiler plugin complains, pin or bump Kotlin — do not silently “fix” it by dropping `@Serializable`.
+- Rules are constraints, not a schema. The next session must write `docs/schema.md` and sample JSON *before* generating composables. If the model jumps to `MainActivity` UI, reject that.
+
+### 2. _(pending — schema / engine session)_
+
+### 3. _(pending — component or perf session)_
+
+---
+
+## One AI failure
+
+_(Fill the first time the model is wrong about schema, Compose APIs, or perf — and how it was caught. Do not invent one.)_
+
+---
+
+## Session log
+
+| When | Prompt intent | Kept | Rejected |
+|---|---|---|---|
+| 2026-08-15 | Hour 0 setup on existing Android project | Deps, rules, this file, git init | Renderer / home UI (out of scope for this block) |

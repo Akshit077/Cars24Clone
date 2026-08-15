@@ -1,0 +1,17 @@
+---
+description: Core SDUI assignment invariants — schema, actions, fallback, AI evidence
+alwaysApply: true
+---
+
+# SDUI assignment invariants
+
+This repo is a take-home SDUI system, not a hardcoded Cars24 clone wearing JSON.
+
+- **Primitives only.** Registry types are layout (`column`, `row`, `spacer`, `section`), collections (`list`, `grid`, `carousel`), leaves (`text`, `image`, `icon`, `button`, `chip`, `search`), containers (`card`, `sheet`, `tabs`). Never add `HomeBanner`, `CarRail`, `CategoryChips`, or any page-specific type.
+- **A car card is composition.** `card` + children. Not `CarCard`.
+- **Behavior lives in JSON.** Taps, chip selection, EMI updates, and sheets are `actions` / `bind` / `visibleIf` / `state`. Do not put that logic in composable `onClick` lambdas.
+- **Unknown types never crash.** Unregistered `type` → visible fallback node. Always keep a demo payload that proves this.
+- **One stack.** Android / Kotlin / Compose only unless docs, recording, and fallback already exist.
+- **AI evidence is a deliverable.** Append real prompts to `AI_WORKFLOW.md` as you go. Do not reconstruct later. Reject page-specific schema suggestions from the model.
+
+When unsure, optimize for the surprise-screen interview: a new Cars24 page should be JSON-only unless a primitive is truly missing.

@@ -1,0 +1,13 @@
+---
+description: Submission docs must stay honest and complete
+globs: "README.md,PERF.md,COVERAGE.md,AI_WORKFLOW.md"
+alwaysApply: false
+---
+
+# Assignment docs
+
+- `README.md`: screen choice + why, architecture, schema rationale, versioning story (old app + new payload), trade-offs, setup.
+- `PERF.md`: device, release-build methodology, static vs SDUI, overhead %, what you tried after measuring. Ugly numbers are fine. No methodology = fail.
+- `COVERAGE.md`: registry inventory, JSON-only patterns, honest % and gaps (map/video/camera need new leaves).
+- `AI_WORKFLOW.md`: tool stack, these rule files, three real prompt→outcome stories (what you rejected and why), one AI failure, how you verify generated code.
+- Scoping is a feature. If you cut a section, write the trade-off. Do not invent coverage or timings.

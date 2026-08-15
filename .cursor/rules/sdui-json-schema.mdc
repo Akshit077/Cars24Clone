@@ -1,0 +1,22 @@
+---
+description: JSON payload and schema contract rules
+globs: "**/*.json,**/schema.md"
+alwaysApply: false
+---
+
+# SDUI JSON contract
+
+- Document shape: `schemaVersion`, `minClientVersion`, `state`, `root` (a node tree).
+- Every node has `type`, optional `id`, `props`, `children`, `actions`, `bind`, `visibleIf`.
+- Style with tokens (`color.primary`, `space.md`), not one-off hex in every node unless the token is missing.
+- Interactions are data: `{ "type": "setState", "path": "tenureMonths", "value": 24 }`, `{ "type": "openSheet", "id": "emiSheet" }`, `{ "type": "navigate", "url": "sdui://car/123" }`.
+- EMI updates via `state` + `bind` / lookup table in the payload. Not a Kotlin `when (tenure)`.
+- Ship `home.json` and `home_unknown_type.json` (includes a type the registry does not know).
+
+```json
+// ❌ BAD
+{ "type": "CarRail", "cars": [] }
+
+// ✅ GOOD
+{ "type": "carousel", "children": [{ "type": "card", "children": [{ "type": "text", "props": { "text": "2019 Swift" } }] }] }
+```
