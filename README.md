@@ -34,8 +34,16 @@ Types are primitives (`column`, `carousel`, `card`, `chip`, …). There is no `C
 
 Internet permission is declared so Coil can load remote images from the JSON payload. Page data itself is local JSON (no live Cars24 APIs).
 
+## Run
+
+The app shell (`SduiHostRoute`) loads JSON and renders it. Overflow menu switches payloads: Home, Unknown type, Car detail. That menu is demo chrome, not part of the page schema.
+
+- Home: chips swap rails, tenure chips update EMI, **Check eligibility** opens the sheet, card taps show a `sdui://…` snackbar.
+- Unknown type: `liveAuctionTicker` shows a visible fallback; the card below still renders.
+- Car detail: same engine, different JSON.
+
 ## Status
 
-Schema and sample JSON are in. Renderer, static twin, and perf loop are next.
+Engine is in (`sdui/registry`, `sdui/runtime`, `sdui/render`). Static twin and `PERF.md` are next.
 
-See `AI_WORKFLOW.md` for how AI is being used. `PERF.md` and `COVERAGE.md` will land with those phases.
+See `AI_WORKFLOW.md` for how AI is being used. `COVERAGE.md` will land with the coverage pass.

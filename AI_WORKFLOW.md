@@ -70,7 +70,25 @@ These exist before any renderer code on purpose. The assignment scores the brief
 - **`HomeBanner` / `CarRail` / `CarCard` types.** Those would make the surprise screen a rewrite. Car tiles are `card` + children.
 - **Renderer / Compose home in this step.** Out of scope; schema first.
 
-### 3. _(pending — engine or perf session)_
+### 3. SDUI engine (2026-08-15)
+
+**Prompt (abridged):** Do the next step — registry, action bus, bind / visibleIf, visible unknown-type fallback, one screen that loads `home.json`. No hardcoded home composable.
+
+**What the model produced:**
+
+- `SduiRegistry` + primitive renderers, `SduiController` / `applyActions`, bind + `visibleIf`
+- `SduiScreen` + `SduiHostRoute` (payload menu is host chrome)
+- Coil `Application` ImageLoader so network images actually load
+- Unit tests for bind, setState, unknown action, registry membership
+
+**What I accepted:** Open props + string `type` registry. Lookup tables for EMI. Grid as a non-lazy row-chunk so it can sit inside a scrolling column. Snackbar stub for `navigate`.
+
+**What I rejected / rewrote:**
+
+- **Hardcoded `HomeScreen` composable.** `MainActivity` only hosts `SduiHostRoute`.
+- **ViewModel fields named `tenureMonths` / `selectedCategory`.** State is a `JsonObject` the JSON writes.
+- **`Card(onClick = {})` when there are no actions.** That still consumes clicks; non-action cards use the non-clickable `Card` overload.
+- **Sealed action types.** Unknown actions no-op so a future `share` does not crash decode.
 
 ---
 
@@ -86,3 +104,4 @@ _(Fill the first time the model is wrong about schema, Compose APIs, or perf —
 |---|---|---|---|
 | 2026-08-15 | Hour 0 setup on existing Android project | Deps, rules, this file, git init | Renderer / home UI (out of scope for this block) |
 | 2026-08-15 | Schema + sample JSON | Primitive contract, 3 payloads, parse models/tests | Sealed per-widget nodes; page-specific types; Compose UI |
+| 2026-08-15 | SDUI engine | Registry, actions, bind, fallback, JSON host | Hardcoded HomeScreen; page-specific ViewModel state |

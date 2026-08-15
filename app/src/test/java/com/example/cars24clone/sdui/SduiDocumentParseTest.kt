@@ -3,6 +3,7 @@ package com.example.cars24clone.sdui
 import com.example.cars24clone.sdui.model.SduiDocument
 import com.example.cars24clone.sdui.model.SduiJson
 import com.example.cars24clone.sdui.model.walkNodes
+import com.example.cars24clone.sdui.runtime.resolveBindText
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -24,6 +25,10 @@ class SduiDocumentParseTest {
         assertTrue(doc.sheets.containsKey("loanSheet"))
         assertTrue(doc.walkNodes().any { it.bind.containsKey("text") })
         assertTrue(doc.walkNodes().none { it.type in PAGE_SPECIFIC_TYPES })
+        assertEquals(
+            "₹4,599/mo",
+            resolveBindText("lookups.emiByTenure[state.tenureMonths]", doc.state, doc.lookups),
+        )
     }
 
     @Test
