@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "minClientVersion": 1,
+  "screen": {
+    "id": "home-unknown-demo",
+    "title": "Cars24"
+  },
+  "state": {},
+  "lookups": {},
+  "sheets": {},
+  "root": {
+    "type": "column",
+    "style": { "padding": "space.md", "gap": "space.md", "background": "color.bg" },
+    "children": [
+      {
+        "type": "text",
+        "props": { "text": "Unknown type demo", "variant": "title" }
+      },
+      {
+        "type": "text",
+        "props": {
+          "text": "The next node is a type this client does not register. The page must keep rendering.",
+          "variant": "body"
+        }
+      },
+      {
+        "id": "future-slot",
+        "type": "liveAuctionTicker",
+        "props": { "text": "Live auction — 12 cars ending soon" }
+      },
+      {
+        "type": "card",
+        "style": { "padding": "space.md", "background": "color.surface", "corner": "radius.md" },
+        "children": [
+          {
+            "type": "text",
+            "props": { "text": "2019 Maruti Swift VXI", "variant": "body" }
+          },
+          {
+            "type": "text",
+            "props": { "text": "Still renders after the unknown node.", "variant": "caption" }
+          }
+        ]
+      }
+    ]
+  }
+}

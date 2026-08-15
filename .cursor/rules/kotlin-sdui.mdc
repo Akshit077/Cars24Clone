@@ -7,7 +7,7 @@ alwaysApply: false
 # Kotlin SDUI engine
 
 - Keep the engine in `sdui/` (`model`, `registry`, `runtime`, `render`). Screens in `ui/`. Leaf chrome in `ui/components/` is shared by the SDUI and static twins.
-- Parse with `kotlinx.serialization`. Prefer a sealed `SduiNode` / `SduiAction` over `Map<String, Any>`.
+- Parse with `kotlinx.serialization`. Use a single `SduiNode` / `SduiAction` data class with `type: String` — not sealed per-widget subtypes (those fail decode on unknown types) and not `Map<String, Any>`.
 - Registry maps `type` → `@Composable (node, dispatcher) -> Unit`. No giant `when` in `MainActivity`.
 - Recurse through children. Collections use `LazyRow` / `LazyColumn` with stable keys.
 - Actions go through `ActionDispatcher`. Bindings resolve against `SduiState`, not ViewModel fields named after home-page widgets.

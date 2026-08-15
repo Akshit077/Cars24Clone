@@ -51,9 +51,26 @@ These exist before any renderer code on purpose. The assignment scores the brief
 - Serialization runtime is `1.10.0` (fits Kotlin `2.2.10`) rather than `1.11.0` (defaults to Kotlin 2.3). If the compiler plugin complains, pin or bump Kotlin — do not silently “fix” it by dropping `@Serializable`.
 - Rules are constraints, not a schema. The next session must write `docs/schema.md` and sample JSON *before* generating composables. If the model jumps to `MainActivity` UI, reject that.
 
-### 2. _(pending — schema / engine session)_
+### 2. Schema + sample JSON (2026-08-15)
 
-### 3. _(pending — component or perf session)_
+**Prompt (abridged):** Do the next step after hour 0 — first git commit, then `docs/schema.md` and v0 `home.json` before any Compose views.
+
+**What the model produced:**
+
+- `docs/schema.md` (document, primitives, bind, visibleIf, actions, versioning)
+- `home.json`, `home_unknown_type.json`, `car_detail_sketch.json`
+- `SduiDocument` + parse unit tests
+- README screen-choice paragraph
+
+**What I accepted:** Open `props` (`JsonObject`) so new leaf attributes do not require a client release. Structured `visibleIf` (`eq` / `in` / `neq`) instead of a general expression language. Lookup tables for EMI, not a formula engine. A car-detail *sketch* payload to rehearse the surprise screen.
+
+**What I rejected / rewrote:**
+
+- **Sealed `SduiNode` subtypes per widget.** The Kotlin rule suggested sealed nodes over `Map<String, Any>`. Sealed types fail decode on `liveAuctionTicker`, which breaks the required unknown-type fallback. Kept a single `SduiNode` data class with `type: String`.
+- **`HomeBanner` / `CarRail` / `CarCard` types.** Those would make the surprise screen a rewrite. Car tiles are `card` + children.
+- **Renderer / Compose home in this step.** Out of scope; schema first.
+
+### 3. _(pending — engine or perf session)_
 
 ---
 
@@ -68,3 +85,4 @@ _(Fill the first time the model is wrong about schema, Compose APIs, or perf —
 | When | Prompt intent | Kept | Rejected |
 |---|---|---|---|
 | 2026-08-15 | Hour 0 setup on existing Android project | Deps, rules, this file, git init | Renderer / home UI (out of scope for this block) |
+| 2026-08-15 | Schema + sample JSON | Primitive contract, 3 payloads, parse models/tests | Sealed per-widget nodes; page-specific types; Compose UI |

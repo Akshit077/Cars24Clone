@@ -1,0 +1,175 @@
+{
+  "schemaVersion": 1,
+  "minClientVersion": 1,
+  "screen": {
+    "id": "car-detail",
+    "title": "2019 Maruti Swift VXI"
+  },
+  "state": {
+    "tenureMonths": 24
+  },
+  "lookups": {
+    "emiByTenure": {
+      "12": "₹8,499/mo",
+      "24": "₹4,599/mo",
+      "36": "₹3,299/mo"
+    }
+  },
+  "sheets": {
+    "loanSheet": {
+      "type": "column",
+      "style": { "padding": "space.lg", "gap": "space.md" },
+      "children": [
+        {
+          "type": "text",
+          "props": { "text": "Book this car", "variant": "title" }
+        },
+        {
+          "type": "text",
+          "bind": { "text": "lookups.emiByTenure[state.tenureMonths]" },
+          "props": { "text": "₹4,599/mo", "variant": "price" }
+        },
+        {
+          "type": "button",
+          "props": { "text": "Pay token", "variant": "primary" },
+          "actions": [{ "type": "closeSheet" }]
+        }
+      ]
+    }
+  },
+  "root": {
+    "type": "column",
+    "style": { "background": "color.bg", "gap": "space.md" },
+    "children": [
+      {
+        "type": "carousel",
+        "props": { "itemWidth": 360 },
+        "children": [
+          {
+            "type": "image",
+            "props": {
+              "url": "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=1200",
+              "aspectRatio": "16:9"
+            }
+          },
+          {
+            "type": "image",
+            "props": {
+              "url": "https://images.unsplash.com/photo-1485291571150-772bcfc10da5?w=1200",
+              "aspectRatio": "16:9"
+            }
+          }
+        ]
+      },
+      {
+        "type": "column",
+        "style": { "paddingH": "space.md", "gap": "space.xs" },
+        "children": [
+          {
+            "type": "text",
+            "props": { "text": "2019 Maruti Swift VXI", "variant": "title" }
+          },
+          {
+            "type": "text",
+            "props": { "text": "₹4.85 Lakh", "variant": "price" }
+          },
+          {
+            "type": "text",
+            "props": { "text": "Gurugram hub · 42,000 km", "variant": "caption" }
+          }
+        ]
+      },
+      {
+        "type": "section",
+        "props": { "title": "Specs" },
+        "children": [
+          {
+            "type": "grid",
+            "style": { "paddingH": "space.md", "gap": "space.sm" },
+            "props": { "columns": 2 },
+            "children": [
+              {
+                "type": "card",
+                "style": { "padding": "space.sm", "background": "color.surface", "corner": "radius.sm" },
+                "children": [
+                  { "type": "text", "props": { "text": "Fuel", "variant": "caption" } },
+                  { "type": "text", "props": { "text": "Petrol", "variant": "body" } }
+                ]
+              },
+              {
+                "type": "card",
+                "style": { "padding": "space.sm", "background": "color.surface", "corner": "radius.sm" },
+                "children": [
+                  { "type": "text", "props": { "text": "Transmission", "variant": "caption" } },
+                  { "type": "text", "props": { "text": "Manual", "variant": "body" } }
+                ]
+              },
+              {
+                "type": "card",
+                "style": { "padding": "space.sm", "background": "color.surface", "corner": "radius.sm" },
+                "children": [
+                  { "type": "text", "props": { "text": "Owners", "variant": "caption" } },
+                  { "type": "text", "props": { "text": "1st", "variant": "body" } }
+                ]
+              },
+              {
+                "type": "card",
+                "style": { "padding": "space.sm", "background": "color.surface", "corner": "radius.sm" },
+                "children": [
+                  { "type": "text", "props": { "text": "RTO", "variant": "caption" } },
+                  { "type": "text", "props": { "text": "HR-26", "variant": "body" } }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "card",
+        "style": { "padding": "space.md", "background": "color.surface", "corner": "radius.md" },
+        "children": [
+          {
+            "type": "column",
+            "style": { "paddingH": "space.md", "gap": "space.sm" },
+            "children": [
+              {
+                "type": "text",
+                "bind": { "text": "lookups.emiByTenure[state.tenureMonths]" },
+                "props": { "text": "₹4,599/mo", "variant": "price" }
+              },
+              {
+                "type": "row",
+                "style": { "gap": "space.sm" },
+                "children": [
+                  {
+                    "type": "chip",
+                    "props": { "text": "12 mo", "value": 12 },
+                    "bind": { "selected": "state.tenureMonths" },
+                    "actions": [{ "type": "setState", "path": "tenureMonths", "value": 12 }]
+                  },
+                  {
+                    "type": "chip",
+                    "props": { "text": "24 mo", "value": 24 },
+                    "bind": { "selected": "state.tenureMonths" },
+                    "actions": [{ "type": "setState", "path": "tenureMonths", "value": 24 }]
+                  },
+                  {
+                    "type": "chip",
+                    "props": { "text": "36 mo", "value": 36 },
+                    "bind": { "selected": "state.tenureMonths" },
+                    "actions": [{ "type": "setState", "path": "tenureMonths", "value": 36 }]
+                  }
+                ]
+              },
+              {
+                "type": "button",
+                "props": { "text": "Book this car", "variant": "primary" },
+                "actions": [{ "type": "openSheet", "id": "loanSheet" }]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
