@@ -39,11 +39,17 @@
   },
   "root": {
     "type": "column",
-    "style": { "background": "color.bg", "gap": "space.md" },
+    "style": {
+      "background": "color.bg",
+      "gap": "space.md",
+      "insets": "statusBars",
+      "paddingV": "space.sm"
+    },
     "children": [
       {
         "type": "carousel",
-        "props": { "itemWidth": 360 },
+        "style": { "paddingH": "space.md" },
+        "props": { "itemWidth": 328 },
         "children": [
           {
             "type": "image",

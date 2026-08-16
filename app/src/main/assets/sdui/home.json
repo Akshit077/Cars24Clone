@@ -6,7 +6,8 @@
     "title": "Cars24"
   },
   "state": {
-    "selectedCategory": "all",
+    "selectedTab": "all",
+    "usedCarFilter": "recent",
     "tenureMonths": 24
   },
   "lookups": {
@@ -19,11 +20,17 @@
   "sheets": {
     "loanSheet": {
       "type": "column",
-      "style": { "padding": "space.lg", "gap": "space.md" },
+      "style": {
+        "padding": "space.lg",
+        "gap": "space.md"
+      },
       "children": [
         {
           "type": "text",
-          "props": { "text": "Check loan eligibility", "variant": "title" }
+          "props": {
+            "text": "Check loan eligibility",
+            "variant": "title"
+          }
         },
         {
           "type": "text",
@@ -34,159 +41,555 @@
         },
         {
           "type": "text",
-          "bind": { "text": "lookups.emiByTenure[state.tenureMonths]" },
-          "props": { "text": "₹4,599/mo", "variant": "price" }
+          "bind": {
+            "text": "lookups.emiByTenure[state.tenureMonths]"
+          },
+          "props": {
+            "text": "₹4,599/mo",
+            "variant": "price"
+          }
         },
         {
           "type": "button",
-          "props": { "text": "Continue", "variant": "primary" },
-          "actions": [{ "type": "closeSheet" }]
+          "style": {
+            "width": "fill"
+          },
+          "props": {
+            "text": "Continue",
+            "variant": "primary"
+          },
+          "actions": [
+            {
+              "type": "closeSheet"
+            }
+          ]
+        }
+      ]
+    },
+    "addVehicleSheet": {
+      "type": "column",
+      "style": {
+        "padding": "space.lg",
+        "gap": "space.md"
+      },
+      "children": [
+        {
+          "type": "text",
+          "props": {
+            "text": "Add your vehicle",
+            "variant": "title"
+          }
+        },
+        {
+          "type": "text",
+          "props": {
+            "text": "Enter your registration number to add a car to Orbit and unlock challan, FASTag, and insurance.",
+            "variant": "body"
+          }
+        },
+        {
+          "type": "button",
+          "style": {
+            "width": "fill"
+          },
+          "props": {
+            "text": "Continue",
+            "variant": "primary"
+          },
+          "actions": [
+            {
+              "type": "closeSheet"
+            }
+          ]
         }
       ]
     }
   },
   "root": {
     "type": "column",
-    "style": { "background": "color.bg", "gap": "space.lg" },
+    "style": {
+      "background": "color.bg",
+      "gap": "space.lg"
+    },
     "children": [
       {
-        "id": "header",
-        "type": "row",
-        "style": { "paddingH": "space.md", "paddingV": "space.sm", "gap": "space.sm" },
+        "id": "hero",
+        "type": "column",
+        "style": {
+          "background": "color.hero",
+          "insets": "statusBars",
+          "paddingV": "space.sm",
+          "gap": "space.md"
+        },
         "children": [
           {
-            "type": "icon",
-            "props": { "name": "location" }
+            "id": "search",
+            "type": "search",
+            "style": {
+              "paddingH": "space.md"
+            },
+            "props": {
+              "placeholder": "Search Toyota",
+              "variant": "hero"
+            },
+            "actions": [
+              {
+                "type": "navigate",
+                "url": "sdui://search"
+              }
+            ]
           },
           {
-            "type": "column",
-            "style": { "gap": "space.xs" },
+            "id": "tabs",
+            "type": "row",
+            "style": {
+              "paddingH": "space.sm",
+              "gap": "space.xs"
+            },
             "children": [
               {
-                "type": "text",
-                "props": { "text": "Delivering to", "variant": "caption" }
+                "type": "chip",
+                "props": {
+                  "text": "All",
+                  "value": "all",
+                  "variant": "tab"
+                },
+                "bind": {
+                  "selected": "state.selectedTab"
+                },
+                "actions": [
+                  {
+                    "type": "setState",
+                    "path": "selectedTab",
+                    "value": "all"
+                  }
+                ]
               },
               {
-                "type": "text",
-                "props": { "text": "Gurugram, 122001", "variant": "body" }
+                "type": "chip",
+                "props": {
+                  "text": "Buy used car",
+                  "value": "buy",
+                  "variant": "tab"
+                },
+                "bind": {
+                  "selected": "state.selectedTab"
+                },
+                "actions": [
+                  {
+                    "type": "setState",
+                    "path": "selectedTab",
+                    "value": "buy"
+                  }
+                ]
+              },
+              {
+                "type": "chip",
+                "props": {
+                  "text": "Sell car",
+                  "value": "sell",
+                  "variant": "tab"
+                },
+                "bind": {
+                  "selected": "state.selectedTab"
+                },
+                "actions": [
+                  {
+                    "type": "setState",
+                    "path": "selectedTab",
+                    "value": "sell"
+                  }
+                ]
+              },
+              {
+                "type": "chip",
+                "props": {
+                  "text": "Loans",
+                  "value": "loans",
+                  "variant": "tab"
+                },
+                "bind": {
+                  "selected": "state.selectedTab"
+                },
+                "actions": [
+                  {
+                    "type": "setState",
+                    "path": "selectedTab",
+                    "value": "loans"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "manage",
+            "type": "section",
+            "props": {
+              "title": "Manage your vehicle",
+              "titleVariant": "onHeroTitle",
+              "actionText": "+ Add vehicle"
+            },
+            "visibleIf": {
+              "path": "state.selectedTab",
+              "eq": "all"
+            },
+            "actions": [
+              {
+                "type": "openSheet",
+                "id": "addVehicleSheet"
+              }
+            ],
+            "children": [
+              {
+                "type": "grid",
+                "style": {
+                  "paddingH": "space.md",
+                  "gap": "space.sm"
+                },
+                "props": {
+                  "columns": 3
+                },
+                "children": [
+                  {
+                    "type": "card",
+                    "style": {
+                      "padding": "space.sm",
+                      "background": "color.surface",
+                      "corner": "radius.md"
+                    },
+                    "actions": [
+                      {
+                        "type": "navigate",
+                        "url": "sdui://challan"
+                      }
+                    ],
+                    "children": [
+                      {
+                        "type": "text",
+                        "props": {
+                          "text": "Pay challan",
+                          "variant": "body",
+                          "minLines": 2,
+                          "maxLines": 2
+                        }
+                      },
+                      {
+                        "type": "image",
+                        "props": {
+                          "url": "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=400&h=400&q=80",
+                          "aspectRatio": "1:1",
+                          "scale": "fit"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "type": "card",
+                    "style": {
+                      "padding": "space.sm",
+                      "background": "color.surface",
+                      "corner": "radius.md"
+                    },
+                    "actions": [
+                      {
+                        "type": "navigate",
+                        "url": "sdui://fastag"
+                      }
+                    ],
+                    "children": [
+                      {
+                        "type": "text",
+                        "props": {
+                          "text": "Recharge FASTag",
+                          "variant": "body",
+                          "minLines": 2,
+                          "maxLines": 2
+                        }
+                      },
+                      {
+                        "type": "image",
+                        "props": {
+                          "url": "https://images.unsplash.com/photo-1449965404019-0194382f21d4?auto=format&fit=crop&w=400&h=400&q=80",
+                          "aspectRatio": "1:1",
+                          "scale": "fit"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "type": "card",
+                    "style": {
+                      "padding": "space.sm",
+                      "background": "color.surface",
+                      "corner": "radius.md"
+                    },
+                    "actions": [
+                      {
+                        "type": "navigate",
+                        "url": "sdui://insurance"
+                      }
+                    ],
+                    "children": [
+                      {
+                        "type": "text",
+                        "props": {
+                          "text": "Get insurance",
+                          "variant": "body",
+                          "minLines": 2,
+                          "maxLines": 2
+                        }
+                      },
+                      {
+                        "type": "image",
+                        "props": {
+                          "url": "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=400&h=400&q=80",
+                          "aspectRatio": "1:1",
+                          "scale": "fit"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "type": "card",
+                    "style": {
+                      "padding": "space.sm",
+                      "background": "color.surface",
+                      "corner": "radius.md"
+                    },
+                    "actions": [
+                      {
+                        "type": "navigate",
+                        "url": "sdui://cash-against-car"
+                      }
+                    ],
+                    "children": [
+                      {
+                        "type": "text",
+                        "props": {
+                          "text": "Cash against car",
+                          "variant": "body",
+                          "minLines": 2,
+                          "maxLines": 2
+                        }
+                      },
+                      {
+                        "type": "image",
+                        "props": {
+                          "url": "https://images.unsplash.com/photo-1553440569-bcc63803a83d?auto=format&fit=crop&w=400&h=400&q=80",
+                          "aspectRatio": "1:1",
+                          "scale": "fit"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "type": "card",
+                    "style": {
+                      "padding": "space.sm",
+                      "background": "color.surface",
+                      "corner": "radius.md"
+                    },
+                    "actions": [
+                      {
+                        "type": "navigate",
+                        "url": "sdui://rsa"
+                      }
+                    ],
+                    "children": [
+                      {
+                        "type": "text",
+                        "props": {
+                          "text": "Road side assistance",
+                          "variant": "body",
+                          "minLines": 2,
+                          "maxLines": 2
+                        }
+                      },
+                      {
+                        "type": "image",
+                        "props": {
+                          "url": "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?auto=format&fit=crop&w=400&h=400&q=80",
+                          "aspectRatio": "1:1",
+                          "scale": "fit"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "type": "card",
+                    "style": {
+                      "padding": "space.sm",
+                      "background": "color.surface",
+                      "corner": "radius.md"
+                    },
+                    "actions": [
+                      {
+                        "type": "navigate",
+                        "url": "sdui://warranty"
+                      }
+                    ],
+                    "children": [
+                      {
+                        "type": "text",
+                        "props": {
+                          "text": "Get warranty",
+                          "variant": "body",
+                          "minLines": 2,
+                          "maxLines": 2
+                        }
+                      },
+                      {
+                        "type": "image",
+                        "props": {
+                          "url": "https://images.unsplash.com/photo-1542362567-b07e54358753?auto=format&fit=crop&w=400&h=400&q=80",
+                          "aspectRatio": "1:1",
+                          "scale": "fit"
+                        }
+                      }
+                    ]
+                  }
+                ]
               }
             ]
           }
         ]
       },
       {
-        "id": "search",
-        "type": "search",
-        "style": { "paddingH": "space.md" },
-        "props": { "placeholder": "Search for your dream car" },
-        "actions": [{ "type": "navigate", "url": "sdui://search" }]
-      },
-      {
-        "id": "banners",
-        "type": "carousel",
-        "style": { "paddingH": "space.md", "gap": "space.sm" },
-        "props": { "itemWidth": 320 },
+        "id": "orbit",
+        "type": "section",
+        "props": {
+          "title": "Offers for you"
+        },
+        "visibleIf": {
+          "path": "state.selectedTab",
+          "eq": "all"
+        },
         "children": [
           {
             "type": "card",
-            "style": { "corner": "radius.md" },
-            "actions": [{ "type": "navigate", "url": "sdui://campaign/zero-down" }],
+            "style": {
+              "padding": "space.md",
+              "paddingH": "space.md",
+              "background": "color.orbit",
+              "corner": "radius.lg"
+            },
             "children": [
               {
-                "type": "image",
-                "props": {
-                  "url": "https://images.unsplash.com/photo-1485291571150-772bcfc10da5?w=1200",
-                  "aspectRatio": "16:9"
-                }
+                "type": "column",
+                "style": {
+                  "gap": "space.sm"
+                },
+                "children": [
+                  {
+                    "type": "text",
+                    "props": {
+                      "text": "Cars24 x Spotify Premium",
+                      "variant": "onHero"
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "props": {
+                      "text": "Add your car to Orbit",
+                      "variant": "onHeroTitle"
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "props": {
+                      "text": "Enjoy 3-months Spotify Premium free",
+                      "variant": "onHero"
+                    }
+                  },
+                  {
+                    "type": "button",
+                    "props": {
+                      "text": "Add car now",
+                      "variant": "inverse"
+                    },
+                    "actions": [
+                      {
+                        "type": "openSheet",
+                        "id": "addVehicleSheet"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "image",
+                    "props": {
+                      "url": "https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?auto=format&fit=crop&w=1200&h=675&q=80",
+                      "aspectRatio": "16:9",
+                      "scale": "fit"
+                    }
+                  }
+                ]
               }
-            ]
-          },
-          {
-            "type": "card",
-            "style": { "corner": "radius.md" },
-            "actions": [{ "type": "navigate", "url": "sdui://sell" }],
-            "children": [
-              {
-                "type": "image",
-                "props": {
-                  "url": "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=1200",
-                  "aspectRatio": "16:9"
-                }
-              }
-            ]
+            ],
+            "id": "orbit-card"
           }
         ]
       },
       {
-        "id": "categories",
-        "type": "carousel",
-        "style": { "paddingH": "space.md", "gap": "space.sm" },
-        "props": { "itemWidth": 108 },
-        "children": [
-          {
-            "type": "chip",
-            "props": { "text": "All cars", "value": "all" },
-            "bind": { "selected": "state.selectedCategory" },
-            "actions": [{ "type": "setState", "path": "selectedCategory", "value": "all" }]
-          },
-          {
-            "type": "chip",
-            "props": { "text": "SUV", "value": "suv" },
-            "bind": { "selected": "state.selectedCategory" },
-            "actions": [{ "type": "setState", "path": "selectedCategory", "value": "suv" }]
-          },
-          {
-            "type": "chip",
-            "props": { "text": "Hatchback", "value": "hatch" },
-            "bind": { "selected": "state.selectedCategory" },
-            "actions": [{ "type": "setState", "path": "selectedCategory", "value": "hatch" }]
-          },
-          {
-            "type": "chip",
-            "props": { "text": "Sedan", "value": "sedan" },
-            "bind": { "selected": "state.selectedCategory" },
-            "actions": [{ "type": "setState", "path": "selectedCategory", "value": "sedan" }]
-          }
-        ]
-      },
-      {
-        "id": "rail-all",
+        "id": "showrooms",
         "type": "section",
-        "props": { "title": "Cars for you" },
-        "visibleIf": { "path": "state.selectedCategory", "eq": "all" },
+        "props": {
+          "title": "3 showrooms in your city"
+        },
+        "visibleIf": {
+          "path": "state.selectedTab",
+          "eq": "all"
+        },
         "children": [
           {
             "type": "carousel",
-            "style": { "paddingH": "space.md", "gap": "space.md" },
-            "props": { "itemWidth": 240 },
+            "style": {
+              "paddingH": "space.md",
+              "gap": "space.md"
+            },
+            "props": {
+              "itemWidth": 220
+            },
             "children": [
               {
                 "type": "card",
-                "style": { "background": "color.surface", "corner": "radius.md" },
-                "actions": [{ "type": "navigate", "url": "sdui://car/swift-2019" }],
+                "style": {
+                  "background": "color.surface",
+                  "corner": "radius.md"
+                },
+                "actions": [
+                  {
+                    "type": "navigate",
+                    "url": "sdui://showroom/wave-one"
+                  }
+                ],
                 "children": [
                   {
                     "type": "image",
                     "props": {
-                      "url": "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=800",
+                      "url": "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=800&h=600&q=80",
                       "aspectRatio": "4:3"
                     }
                   },
                   {
                     "type": "column",
-                    "style": { "padding": "space.sm", "gap": "space.xs" },
+                    "style": {
+                      "padding": "space.sm",
+                      "gap": "space.xs"
+                    },
                     "children": [
                       {
                         "type": "text",
-                        "props": { "text": "2019 Maruti Swift VXI", "variant": "body" }
+                        "props": {
+                          "text": "150+ cars",
+                          "variant": "caption"
+                        }
                       },
                       {
                         "type": "text",
-                        "props": { "text": "42,000 km · Petrol · Manual", "variant": "caption" }
-                      },
-                      {
-                        "type": "text",
-                        "props": { "text": "₹4.85 Lakh", "variant": "price" }
+                        "props": {
+                          "text": "Wave One Mall",
+                          "variant": "title"
+                        }
                       }
                     ]
                   }
@@ -194,31 +597,44 @@
               },
               {
                 "type": "card",
-                "style": { "background": "color.surface", "corner": "radius.md" },
-                "actions": [{ "type": "navigate", "url": "sdui://car/creta-2021" }],
+                "style": {
+                  "background": "color.surface",
+                  "corner": "radius.md"
+                },
+                "actions": [
+                  {
+                    "type": "navigate",
+                    "url": "sdui://showroom/dlf"
+                  }
+                ],
                 "children": [
                   {
                     "type": "image",
                     "props": {
-                      "url": "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=800",
+                      "url": "https://images.unsplash.com/photo-1544636331-e26879cd4d9b?auto=format&fit=crop&w=800&h=600&q=80",
                       "aspectRatio": "4:3"
                     }
                   },
                   {
                     "type": "column",
-                    "style": { "padding": "space.sm", "gap": "space.xs" },
+                    "style": {
+                      "padding": "space.sm",
+                      "gap": "space.xs"
+                    },
                     "children": [
                       {
                         "type": "text",
-                        "props": { "text": "2021 Hyundai Creta SX", "variant": "body" }
+                        "props": {
+                          "text": "80+ cars",
+                          "variant": "caption"
+                        }
                       },
                       {
                         "type": "text",
-                        "props": { "text": "28,400 km · Diesel · Auto", "variant": "caption" }
-                      },
-                      {
-                        "type": "text",
-                        "props": { "text": "₹12.40 Lakh", "variant": "price" }
+                        "props": {
+                          "text": "DLF Cyber Hub",
+                          "variant": "title"
+                        }
                       }
                     ]
                   }
@@ -226,31 +642,44 @@
               },
               {
                 "type": "card",
-                "style": { "background": "color.surface", "corner": "radius.md" },
-                "actions": [{ "type": "navigate", "url": "sdui://car/city-2020" }],
+                "style": {
+                  "background": "color.surface",
+                  "corner": "radius.md"
+                },
+                "actions": [
+                  {
+                    "type": "navigate",
+                    "url": "sdui://showroom/ambience"
+                  }
+                ],
                 "children": [
                   {
                     "type": "image",
                     "props": {
-                      "url": "https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=800",
+                      "url": "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=800&h=600&q=80",
                       "aspectRatio": "4:3"
                     }
                   },
                   {
                     "type": "column",
-                    "style": { "padding": "space.sm", "gap": "space.xs" },
+                    "style": {
+                      "padding": "space.sm",
+                      "gap": "space.xs"
+                    },
                     "children": [
                       {
                         "type": "text",
-                        "props": { "text": "2020 Honda City ZX", "variant": "body" }
+                        "props": {
+                          "text": "10+ cars",
+                          "variant": "caption"
+                        }
                       },
                       {
                         "type": "text",
-                        "props": { "text": "31,200 km · Petrol · Auto", "variant": "caption" }
-                      },
-                      {
-                        "type": "text",
-                        "props": { "text": "₹9.10 Lakh", "variant": "price" }
+                        "props": {
+                          "text": "Ambience Mall",
+                          "variant": "title"
+                        }
                       }
                     ]
                   }
@@ -261,45 +690,118 @@
         ]
       },
       {
-        "id": "rail-suv",
+        "id": "buy",
         "type": "section",
-        "props": { "title": "SUVs near you" },
-        "visibleIf": { "path": "state.selectedCategory", "eq": "suv" },
+        "props": {
+          "title": "Buy car",
+          "actionText": "Up to ₹80,000 off",
+          "actionVariant": "badge"
+        },
+        "visibleIf": {
+          "path": "state.selectedTab",
+          "in": [
+            "all",
+            "buy"
+          ]
+        },
         "children": [
           {
             "type": "carousel",
-            "style": { "paddingH": "space.md", "gap": "space.md" },
-            "props": { "itemWidth": 240 },
+            "style": {
+              "paddingH": "space.md",
+              "gap": "space.sm"
+            },
+            "props": {
+              "itemWidth": 148
+            },
             "children": [
               {
                 "type": "card",
-                "style": { "background": "color.surface", "corner": "radius.md" },
-                "actions": [{ "type": "navigate", "url": "sdui://car/creta-2021" }],
+                "style": {
+                  "padding": "space.sm",
+                  "background": "color.buyCard",
+                  "corner": "radius.md"
+                },
+                "actions": [
+                  {
+                    "type": "navigate",
+                    "url": "sdui://buy/all"
+                  }
+                ],
                 "children": [
                   {
-                    "type": "image",
+                    "type": "text",
                     "props": {
-                      "url": "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=800",
-                      "aspectRatio": "4:3"
+                      "text": "All used cars",
+                      "variant": "onHero"
                     }
                   },
                   {
-                    "type": "column",
-                    "style": { "padding": "space.sm", "gap": "space.xs" },
-                    "children": [
-                      {
-                        "type": "text",
-                        "props": { "text": "2021 Hyundai Creta SX", "variant": "body" }
-                      },
-                      {
-                        "type": "text",
-                        "props": { "text": "28,400 km · Diesel · Auto", "variant": "caption" }
-                      },
-                      {
-                        "type": "text",
-                        "props": { "text": "₹12.40 Lakh", "variant": "price" }
-                      }
-                    ]
+                    "type": "image",
+                    "props": {
+                      "url": "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=600&h=450&q=80",
+                      "aspectRatio": "4:3"
+                    }
+                  }
+                ]
+              },
+              {
+                "type": "card",
+                "style": {
+                  "padding": "space.sm",
+                  "background": "color.buyCard",
+                  "corner": "radius.md"
+                },
+                "actions": [
+                  {
+                    "type": "navigate",
+                    "url": "sdui://buy/budget"
+                  }
+                ],
+                "children": [
+                  {
+                    "type": "text",
+                    "props": {
+                      "text": "Budget used cars",
+                      "variant": "onHero"
+                    }
+                  },
+                  {
+                    "type": "image",
+                    "props": {
+                      "url": "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&w=600&h=450&q=80",
+                      "aspectRatio": "4:3"
+                    }
+                  }
+                ]
+              },
+              {
+                "type": "card",
+                "style": {
+                  "padding": "space.sm",
+                  "background": "color.buyCard",
+                  "corner": "radius.md"
+                },
+                "actions": [
+                  {
+                    "type": "navigate",
+                    "url": "sdui://buy/premium"
+                  }
+                ],
+                "children": [
+                  {
+                    "type": "text",
+                    "props": {
+                      "text": "Premium used cars",
+                      "variant": "onHero"
+                    }
+                  },
+                  {
+                    "type": "image",
+                    "props": {
+                      "url": "https://images.unsplash.com/photo-1583121274602-3e2820c69888?auto=format&fit=crop&w=600&h=450&q=80",
+                      "aspectRatio": "4:3"
+                    }
                   }
                 ]
               }
@@ -308,45 +810,116 @@
         ]
       },
       {
-        "id": "rail-hatch",
+        "id": "sell",
         "type": "section",
-        "props": { "title": "Hatchbacks near you" },
-        "visibleIf": { "path": "state.selectedCategory", "eq": "hatch" },
+        "props": {
+          "title": "Sell your car"
+        },
+        "visibleIf": {
+          "path": "state.selectedTab",
+          "in": [
+            "all",
+            "sell"
+          ]
+        },
         "children": [
           {
             "type": "carousel",
-            "style": { "paddingH": "space.md", "gap": "space.md" },
-            "props": { "itemWidth": 240 },
+            "style": {
+              "paddingH": "space.md",
+              "gap": "space.sm"
+            },
+            "props": {
+              "itemWidth": 148
+            },
             "children": [
               {
                 "type": "card",
-                "style": { "background": "color.surface", "corner": "radius.md" },
-                "actions": [{ "type": "navigate", "url": "sdui://car/swift-2019" }],
+                "style": {
+                  "padding": "space.sm",
+                  "background": "color.sellCard",
+                  "corner": "radius.md"
+                },
+                "actions": [
+                  {
+                    "type": "navigate",
+                    "url": "sdui://sell"
+                  }
+                ],
                 "children": [
                   {
-                    "type": "image",
+                    "type": "text",
                     "props": {
-                      "url": "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=800",
-                      "aspectRatio": "4:3"
+                      "text": "Sell your car",
+                      "variant": "onHero"
                     }
                   },
                   {
-                    "type": "column",
-                    "style": { "padding": "space.sm", "gap": "space.xs" },
-                    "children": [
-                      {
-                        "type": "text",
-                        "props": { "text": "2019 Maruti Swift VXI", "variant": "body" }
-                      },
-                      {
-                        "type": "text",
-                        "props": { "text": "42,000 km · Petrol · Manual", "variant": "caption" }
-                      },
-                      {
-                        "type": "text",
-                        "props": { "text": "₹4.85 Lakh", "variant": "price" }
-                      }
-                    ]
+                    "type": "image",
+                    "props": {
+                      "url": "https://images.unsplash.com/photo-1489824904134-891ab64532f1?auto=format&fit=crop&w=600&h=450&q=80",
+                      "aspectRatio": "4:3"
+                    }
+                  }
+                ]
+              },
+              {
+                "type": "card",
+                "style": {
+                  "padding": "space.sm",
+                  "background": "color.sellCard",
+                  "corner": "radius.md"
+                },
+                "actions": [
+                  {
+                    "type": "navigate",
+                    "url": "sdui://valuation"
+                  }
+                ],
+                "children": [
+                  {
+                    "type": "text",
+                    "props": {
+                      "text": "Check car valuation",
+                      "variant": "onHero"
+                    }
+                  },
+                  {
+                    "type": "image",
+                    "props": {
+                      "url": "https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?auto=format&fit=crop&w=600&h=450&q=80",
+                      "aspectRatio": "4:3"
+                    }
+                  }
+                ]
+              },
+              {
+                "type": "card",
+                "style": {
+                  "padding": "space.sm",
+                  "background": "color.sellCard",
+                  "corner": "radius.md"
+                },
+                "actions": [
+                  {
+                    "type": "navigate",
+                    "url": "sdui://scrap"
+                  }
+                ],
+                "children": [
+                  {
+                    "type": "text",
+                    "props": {
+                      "text": "Scrap your car",
+                      "variant": "onHero"
+                    }
+                  },
+                  {
+                    "type": "image",
+                    "props": {
+                      "url": "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?auto=format&fit=crop&w=600&h=450&q=80",
+                      "aspectRatio": "4:3"
+                    }
                   }
                 ]
               }
@@ -355,43 +928,727 @@
         ]
       },
       {
-        "id": "rail-sedan",
+        "id": "loans",
         "type": "section",
-        "props": { "title": "Sedans near you" },
-        "visibleIf": { "path": "state.selectedCategory", "eq": "sedan" },
+        "props": {
+          "title": "Get loans"
+        },
+        "visibleIf": {
+          "path": "state.selectedTab",
+          "in": [
+            "all",
+            "loans"
+          ]
+        },
         "children": [
           {
             "type": "carousel",
-            "style": { "paddingH": "space.md", "gap": "space.md" },
-            "props": { "itemWidth": 240 },
+            "style": {
+              "paddingH": "space.md",
+              "gap": "space.md"
+            },
+            "props": {
+              "itemWidth": 96
+            },
+            "children": [
+              {
+                "type": "column",
+                "style": {
+                  "gap": "space.xs"
+                },
+                "actions": [
+                  {
+                    "type": "navigate",
+                    "url": "sdui://loan/used-car"
+                  }
+                ],
+                "children": [
+                  {
+                    "type": "card",
+                    "style": {
+                      "padding": "space.sm",
+                      "background": "color.cream",
+                      "corner": "radius.lg"
+                    },
+                    "children": [
+                      {
+                        "type": "image",
+                        "props": {
+                          "url": "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=300&h=300&q=80",
+                          "aspectRatio": "1:1",
+                          "scale": "fit"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "type": "text",
+                    "props": {
+                      "text": "Used car loan",
+                      "variant": "caption"
+                    }
+                  }
+                ]
+              },
+              {
+                "type": "column",
+                "style": {
+                  "gap": "space.xs"
+                },
+                "actions": [
+                  {
+                    "type": "navigate",
+                    "url": "sdui://loan/against-car"
+                  }
+                ],
+                "children": [
+                  {
+                    "type": "card",
+                    "style": {
+                      "padding": "space.sm",
+                      "background": "color.cream",
+                      "corner": "radius.lg"
+                    },
+                    "children": [
+                      {
+                        "type": "image",
+                        "props": {
+                          "url": "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?auto=format&fit=crop&w=300&h=300&q=80",
+                          "aspectRatio": "1:1",
+                          "scale": "fit"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "type": "text",
+                    "props": {
+                      "text": "Loan against car",
+                      "variant": "caption"
+                    }
+                  }
+                ]
+              },
+              {
+                "type": "column",
+                "style": {
+                  "gap": "space.xs"
+                },
+                "actions": [
+                  {
+                    "type": "navigate",
+                    "url": "sdui://loan/personal"
+                  }
+                ],
+                "children": [
+                  {
+                    "type": "card",
+                    "style": {
+                      "padding": "space.sm",
+                      "background": "color.cream",
+                      "corner": "radius.lg"
+                    },
+                    "children": [
+                      {
+                        "type": "image",
+                        "props": {
+                          "url": "https://images.unsplash.com/photo-1502877338535-766e1452684a?auto=format&fit=crop&w=300&h=300&q=80",
+                          "aspectRatio": "1:1",
+                          "scale": "fit"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "type": "text",
+                    "props": {
+                      "text": "Personal loan",
+                      "variant": "caption"
+                    }
+                  }
+                ]
+              },
+              {
+                "type": "column",
+                "style": {
+                  "gap": "space.xs"
+                },
+                "actions": [
+                  {
+                    "type": "navigate",
+                    "url": "sdui://credit-score"
+                  }
+                ],
+                "children": [
+                  {
+                    "type": "card",
+                    "style": {
+                      "padding": "space.sm",
+                      "background": "color.cream",
+                      "corner": "radius.lg"
+                    },
+                    "children": [
+                      {
+                        "type": "image",
+                        "props": {
+                          "url": "https://images.unsplash.com/photo-1542282088-fe8426682b8f?auto=format&fit=crop&w=300&h=300&q=80",
+                          "aspectRatio": "1:1",
+                          "scale": "fit"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "type": "text",
+                    "props": {
+                      "text": "Credit score",
+                      "variant": "caption"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "car-check",
+        "type": "section",
+        "props": {
+          "title": "Car check services"
+        },
+        "visibleIf": {
+          "path": "state.selectedTab",
+          "in": [
+            "all",
+            "buy"
+          ]
+        },
+        "children": [
+          {
+            "type": "grid",
+            "style": {
+              "paddingH": "space.md",
+              "gap": "space.sm"
+            },
+            "props": {
+              "columns": 3
+            },
             "children": [
               {
                 "type": "card",
-                "style": { "background": "color.surface", "corner": "radius.md" },
-                "actions": [{ "type": "navigate", "url": "sdui://car/city-2020" }],
+                "style": {
+                  "padding": "space.sm",
+                  "background": "color.cream",
+                  "corner": "radius.md"
+                },
+                "actions": [
+                  {
+                    "type": "navigate",
+                    "url": "sdui://check/pdi"
+                  }
+                ],
+                "children": [
+                  {
+                    "type": "text",
+                    "props": {
+                      "text": "New car PDI",
+                      "variant": "body"
+                    }
+                  },
+                  {
+                    "type": "image",
+                    "props": {
+                      "url": "https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&w=400&h=400&q=80",
+                      "aspectRatio": "1:1",
+                      "scale": "fit"
+                    }
+                  }
+                ]
+              },
+              {
+                "type": "card",
+                "style": {
+                  "padding": "space.sm",
+                  "background": "color.cream",
+                  "corner": "radius.md"
+                },
+                "actions": [
+                  {
+                    "type": "navigate",
+                    "url": "sdui://check/used"
+                  }
+                ],
+                "children": [
+                  {
+                    "type": "text",
+                    "props": {
+                      "text": "Used car check",
+                      "variant": "body"
+                    }
+                  },
+                  {
+                    "type": "image",
+                    "props": {
+                      "url": "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?auto=format&fit=crop&w=400&h=400&q=80",
+                      "aspectRatio": "1:1",
+                      "scale": "fit"
+                    }
+                  }
+                ]
+              },
+              {
+                "type": "card",
+                "style": {
+                  "padding": "space.sm",
+                  "background": "color.cream",
+                  "corner": "radius.md"
+                },
+                "actions": [
+                  {
+                    "type": "navigate",
+                    "url": "sdui://check/history"
+                  }
+                ],
+                "children": [
+                  {
+                    "type": "text",
+                    "props": {
+                      "text": "Vehicle history",
+                      "variant": "body"
+                    }
+                  },
+                  {
+                    "type": "image",
+                    "props": {
+                      "url": "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&w=400&h=400&q=80",
+                      "aspectRatio": "1:1",
+                      "scale": "fit"
+                    }
+                  }
+                ]
+              },
+              {
+                "type": "card",
+                "style": {
+                  "padding": "space.sm",
+                  "background": "color.cream",
+                  "corner": "radius.md"
+                },
+                "actions": [
+                  {
+                    "type": "navigate",
+                    "url": "sdui://challan"
+                  }
+                ],
+                "children": [
+                  {
+                    "type": "text",
+                    "props": {
+                      "text": "Check challan",
+                      "variant": "body",
+                      "minLines": 2,
+                      "maxLines": 2
+                    }
+                  },
+                  {
+                    "type": "image",
+                    "props": {
+                      "url": "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=400&h=400&q=80",
+                      "aspectRatio": "1:1",
+                      "scale": "fit"
+                    }
+                  }
+                ]
+              },
+              {
+                "type": "card",
+                "style": {
+                  "padding": "space.sm",
+                  "background": "color.cream",
+                  "corner": "radius.md"
+                },
+                "actions": [
+                  {
+                    "type": "navigate",
+                    "url": "sdui://insurance"
+                  }
+                ],
+                "children": [
+                  {
+                    "type": "text",
+                    "props": {
+                      "text": "Check car insurance",
+                      "variant": "body",
+                      "minLines": 2,
+                      "maxLines": 2
+                    }
+                  },
+                  {
+                    "type": "image",
+                    "props": {
+                      "url": "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=400&h=400&q=80",
+                      "aspectRatio": "1:1",
+                      "scale": "fit"
+                    }
+                  }
+                ]
+              },
+              {
+                "type": "card",
+                "style": {
+                  "padding": "space.sm",
+                  "background": "color.cream",
+                  "corner": "radius.md"
+                },
+                "actions": [
+                  {
+                    "type": "navigate",
+                    "url": "sdui://check/odometer"
+                  }
+                ],
+                "children": [
+                  {
+                    "type": "text",
+                    "props": {
+                      "text": "Odometer tampering",
+                      "variant": "body"
+                    }
+                  },
+                  {
+                    "type": "image",
+                    "props": {
+                      "url": "https://images.unsplash.com/photo-1449965404019-0194382f21d4?auto=format&fit=crop&w=400&h=400&q=80",
+                      "aspectRatio": "1:1",
+                      "scale": "fit"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "used-cars",
+        "type": "section",
+        "props": {
+          "title": "Used cars you'll love",
+          "actionText": "View all"
+        },
+        "visibleIf": {
+          "path": "state.selectedTab",
+          "in": [
+            "all",
+            "buy"
+          ]
+        },
+        "actions": [
+          {
+            "type": "navigate",
+            "url": "sdui://buy/all"
+          }
+        ],
+        "children": [
+          {
+            "type": "row",
+            "style": {
+              "paddingH": "space.md",
+              "gap": "space.sm"
+            },
+            "children": [
+              {
+                "type": "chip",
+                "props": {
+                  "text": "Recently viewed",
+                  "value": "recent"
+                },
+                "bind": {
+                  "selected": "state.usedCarFilter"
+                },
+                "actions": [
+                  {
+                    "type": "setState",
+                    "path": "usedCarFilter",
+                    "value": "recent"
+                  }
+                ]
+              },
+              {
+                "type": "chip",
+                "props": {
+                  "text": "Hot deals",
+                  "value": "deals"
+                },
+                "bind": {
+                  "selected": "state.usedCarFilter"
+                },
+                "actions": [
+                  {
+                    "type": "setState",
+                    "path": "usedCarFilter",
+                    "value": "deals"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "rail-recent",
+            "type": "carousel",
+            "style": {
+              "paddingH": "space.md",
+              "gap": "space.md"
+            },
+            "props": {
+              "itemWidth": 240
+            },
+            "visibleIf": {
+              "path": "state.usedCarFilter",
+              "eq": "recent"
+            },
+            "children": [
+              {
+                "type": "card",
+                "style": {
+                  "background": "color.surface",
+                  "corner": "radius.md"
+                },
+                "actions": [
+                  {
+                    "type": "navigate",
+                    "url": "sdui://car/kushaq-2023"
+                  }
+                ],
                 "children": [
                   {
                     "type": "image",
                     "props": {
-                      "url": "https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=800",
+                      "url": "https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?auto=format&fit=crop&w=800&h=600&q=80",
                       "aspectRatio": "4:3"
                     }
                   },
                   {
                     "type": "column",
-                    "style": { "padding": "space.sm", "gap": "space.xs" },
+                    "style": {
+                      "padding": "space.sm",
+                      "gap": "space.xs"
+                    },
                     "children": [
                       {
                         "type": "text",
-                        "props": { "text": "2020 Honda City ZX", "variant": "body" }
+                        "props": {
+                          "text": "Cars24 Owned stock",
+                          "variant": "caption"
+                        }
                       },
                       {
                         "type": "text",
-                        "props": { "text": "31,200 km · Petrol · Auto", "variant": "caption" }
+                        "props": {
+                          "text": "2023 Skoda KUSHAQ",
+                          "variant": "title"
+                        }
                       },
                       {
                         "type": "text",
-                        "props": { "text": "₹9.10 Lakh", "variant": "price" }
+                        "props": {
+                          "text": "Active plus 1.0 TSI",
+                          "variant": "caption"
+                        }
+                      },
+                      {
+                        "type": "text",
+                        "props": {
+                          "text": "₹12.40 Lakh",
+                          "variant": "price"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "card",
+                "style": {
+                  "background": "color.surface",
+                  "corner": "radius.md"
+                },
+                "actions": [
+                  {
+                    "type": "navigate",
+                    "url": "sdui://car/creta-2021"
+                  }
+                ],
+                "children": [
+                  {
+                    "type": "image",
+                    "props": {
+                      "url": "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=800&h=600&q=80",
+                      "aspectRatio": "4:3"
+                    }
+                  },
+                  {
+                    "type": "column",
+                    "style": {
+                      "padding": "space.sm",
+                      "gap": "space.xs"
+                    },
+                    "children": [
+                      {
+                        "type": "text",
+                        "props": {
+                          "text": "2021 Hyundai Creta SX",
+                          "variant": "title"
+                        }
+                      },
+                      {
+                        "type": "text",
+                        "props": {
+                          "text": "28,400 km · Diesel · Auto",
+                          "variant": "caption"
+                        }
+                      },
+                      {
+                        "type": "text",
+                        "props": {
+                          "text": "₹12.40 Lakh",
+                          "variant": "price"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "rail-deals",
+            "type": "carousel",
+            "style": {
+              "paddingH": "space.md",
+              "gap": "space.md"
+            },
+            "props": {
+              "itemWidth": 240
+            },
+            "visibleIf": {
+              "path": "state.usedCarFilter",
+              "eq": "deals"
+            },
+            "children": [
+              {
+                "type": "card",
+                "style": {
+                  "background": "color.surface",
+                  "corner": "radius.md"
+                },
+                "actions": [
+                  {
+                    "type": "navigate",
+                    "url": "sdui://car/swift-2019"
+                  }
+                ],
+                "children": [
+                  {
+                    "type": "image",
+                    "props": {
+                      "url": "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&w=800&h=600&q=80",
+                      "aspectRatio": "4:3"
+                    }
+                  },
+                  {
+                    "type": "column",
+                    "style": {
+                      "padding": "space.sm",
+                      "gap": "space.xs"
+                    },
+                    "children": [
+                      {
+                        "type": "text",
+                        "props": {
+                          "text": "Hot deal",
+                          "variant": "caption"
+                        }
+                      },
+                      {
+                        "type": "text",
+                        "props": {
+                          "text": "2019 Maruti Swift VXI",
+                          "variant": "title"
+                        }
+                      },
+                      {
+                        "type": "text",
+                        "props": {
+                          "text": "42,000 km · Petrol · Manual",
+                          "variant": "caption"
+                        }
+                      },
+                      {
+                        "type": "text",
+                        "props": {
+                          "text": "₹4.85 Lakh",
+                          "variant": "price"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "card",
+                "style": {
+                  "background": "color.surface",
+                  "corner": "radius.md"
+                },
+                "actions": [
+                  {
+                    "type": "navigate",
+                    "url": "sdui://car/city-2020"
+                  }
+                ],
+                "children": [
+                  {
+                    "type": "image",
+                    "props": {
+                      "url": "https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&w=800&h=600&q=80",
+                      "aspectRatio": "4:3"
+                    }
+                  },
+                  {
+                    "type": "column",
+                    "style": {
+                      "padding": "space.sm",
+                      "gap": "space.xs"
+                    },
+                    "children": [
+                      {
+                        "type": "text",
+                        "props": {
+                          "text": "Hot deal",
+                          "variant": "caption"
+                        }
+                      },
+                      {
+                        "type": "text",
+                        "props": {
+                          "text": "2020 Honda City ZX",
+                          "variant": "title"
+                        }
+                      },
+                      {
+                        "type": "text",
+                        "props": {
+                          "text": "31,200 km · Petrol · Auto",
+                          "variant": "caption"
+                        }
+                      },
+                      {
+                        "type": "text",
+                        "props": {
+                          "text": "₹9.10 Lakh",
+                          "variant": "price"
+                        }
                       }
                     ]
                   }
@@ -410,14 +1667,26 @@
           "background": "color.surface",
           "corner": "radius.md"
         },
+        "visibleIf": {
+          "path": "state.selectedTab",
+          "in": [
+            "all",
+            "loans"
+          ]
+        },
         "children": [
           {
             "type": "column",
-            "style": { "gap": "space.sm", "paddingH": "space.md" },
+            "style": {
+              "gap": "space.sm"
+            },
             "children": [
               {
                 "type": "text",
-                "props": { "text": "Car loan EMI", "variant": "title" }
+                "props": {
+                  "text": "Car loan EMI",
+                  "variant": "title"
+                }
               },
               {
                 "type": "text",
@@ -428,105 +1697,86 @@
               },
               {
                 "type": "text",
-                "bind": { "text": "lookups.emiByTenure[state.tenureMonths]" },
-                "props": { "text": "₹4,599/mo", "variant": "price" }
+                "bind": {
+                  "text": "lookups.emiByTenure[state.tenureMonths]"
+                },
+                "props": {
+                  "text": "₹4,599/mo",
+                  "variant": "price"
+                }
               },
               {
                 "type": "row",
-                "style": { "gap": "space.sm" },
+                "style": {
+                  "gap": "space.sm"
+                },
                 "children": [
                   {
                     "type": "chip",
-                    "props": { "text": "12 mo", "value": 12 },
-                    "bind": { "selected": "state.tenureMonths" },
-                    "actions": [{ "type": "setState", "path": "tenureMonths", "value": 12 }]
+                    "props": {
+                      "text": "12 mo",
+                      "value": 12
+                    },
+                    "bind": {
+                      "selected": "state.tenureMonths"
+                    },
+                    "actions": [
+                      {
+                        "type": "setState",
+                        "path": "tenureMonths",
+                        "value": 12
+                      }
+                    ]
                   },
                   {
                     "type": "chip",
-                    "props": { "text": "24 mo", "value": 24 },
-                    "bind": { "selected": "state.tenureMonths" },
-                    "actions": [{ "type": "setState", "path": "tenureMonths", "value": 24 }]
+                    "props": {
+                      "text": "24 mo",
+                      "value": 24
+                    },
+                    "bind": {
+                      "selected": "state.tenureMonths"
+                    },
+                    "actions": [
+                      {
+                        "type": "setState",
+                        "path": "tenureMonths",
+                        "value": 24
+                      }
+                    ]
                   },
                   {
                     "type": "chip",
-                    "props": { "text": "36 mo", "value": 36 },
-                    "bind": { "selected": "state.tenureMonths" },
-                    "actions": [{ "type": "setState", "path": "tenureMonths", "value": 36 }]
+                    "props": {
+                      "text": "36 mo",
+                      "value": 36
+                    },
+                    "bind": {
+                      "selected": "state.tenureMonths"
+                    },
+                    "actions": [
+                      {
+                        "type": "setState",
+                        "path": "tenureMonths",
+                        "value": 36
+                      }
+                    ]
                   }
                 ]
               },
               {
                 "type": "button",
-                "props": { "text": "Check eligibility", "variant": "primary" },
-                "actions": [{ "type": "openSheet", "id": "loanSheet" }]
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "id": "trust",
-        "type": "section",
-        "props": { "title": "Why buy from Cars24" },
-        "children": [
-          {
-            "type": "grid",
-            "style": { "paddingH": "space.md", "gap": "space.sm" },
-            "props": { "columns": 2 },
-            "children": [
-              {
-                "type": "card",
-                "style": { "padding": "space.md", "background": "color.surface", "corner": "radius.md" },
-                "children": [
+                "style": {
+                  "width": "fill"
+                },
+                "props": {
+                  "text": "Check eligibility",
+                  "variant": "primary"
+                },
+                "actions": [
                   {
-                    "type": "text",
-                    "props": { "text": "140+ quality checks", "variant": "body" }
-                  },
-                  {
-                    "type": "text",
-                    "props": { "text": "Every car inspected before listing", "variant": "caption" }
-                  }
-                ]
-              },
-              {
-                "type": "card",
-                "style": { "padding": "space.md", "background": "color.surface", "corner": "radius.md" },
-                "children": [
-                  {
-                    "type": "text",
-                    "props": { "text": "7-day return", "variant": "body" }
-                  },
-                  {
-                    "type": "text",
-                    "props": { "text": "Change your mind, return the car", "variant": "caption" }
-                  }
-                ]
-              },
-              {
-                "type": "card",
-                "style": { "padding": "space.md", "background": "color.surface", "corner": "radius.md" },
-                "children": [
-                  {
-                    "type": "text",
-                    "props": { "text": "1-year warranty", "variant": "body" }
-                  },
-                  {
-                    "type": "text",
-                    "props": { "text": "Cover on major aggregates", "variant": "caption" }
-                  }
-                ]
-              },
-              {
-                "type": "card",
-                "style": { "padding": "space.md", "background": "color.surface", "corner": "radius.md" },
-                "children": [
-                  {
-                    "type": "text",
-                    "props": { "text": "Fixed price", "variant": "body" }
-                  },
-                  {
-                    "type": "text",
-                    "props": { "text": "No haggling at the hub", "variant": "caption" }
+                    "type": "openSheet",
+                    "id": "loanSheet"
                   }
                 ]
               }
@@ -535,16 +1785,10 @@
         ]
       },
       {
-        "id": "footer-cta",
-        "type": "column",
-        "style": { "padding": "space.md", "gap": "space.sm" },
-        "children": [
-          {
-            "type": "button",
-            "props": { "text": "Sell your car", "variant": "secondary" },
-            "actions": [{ "type": "navigate", "url": "sdui://sell" }]
-          }
-        ]
+        "type": "spacer",
+        "props": {
+          "size": "space.lg"
+        }
       }
     ]
   }
