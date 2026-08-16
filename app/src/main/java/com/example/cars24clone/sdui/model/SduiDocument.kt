@@ -48,6 +48,7 @@ data class SduiStyle(
     val corner: String? = null,
     val width: String? = null,
     val height: String? = null,
+    val insets: String? = null,
 )
 
 @kotlinx.serialization.Serializable

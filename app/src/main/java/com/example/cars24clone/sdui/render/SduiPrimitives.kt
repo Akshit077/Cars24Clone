@@ -5,45 +5,45 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedCard
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import coil3.compose.AsyncImage
 import com.example.cars24clone.sdui.model.SduiNode
+import com.example.cars24clone.ui.components.AppActionButton
+import com.example.cars24clone.ui.components.AppFilterChip
+import com.example.cars24clone.ui.components.AppNamedIcon
+import com.example.cars24clone.ui.components.AppNetworkImage
+import com.example.cars24clone.ui.components.AppSearchBar
+import com.example.cars24clone.ui.components.AppSectionHeader
+import com.example.cars24clone.ui.components.AppText
+import com.example.cars24clone.ui.components.appButtonVariant
+import com.example.cars24clone.ui.components.appChipVariant
+import com.example.cars24clone.ui.components.appSearchVariant
+import com.example.cars24clone.ui.components.appTextVariant
+import com.example.cars24clone.ui.components.parseAspectRatio
 import com.example.cars24clone.sdui.runtime.colorToken
 import com.example.cars24clone.sdui.runtime.element
 import com.example.cars24clone.sdui.runtime.int
@@ -61,6 +61,13 @@ internal fun ColumnNode(node: SduiNode, scope: SduiRenderScope) {
     val modifier = node.style.toModifier()
         .then(if (scrollable) Modifier.verticalScroll(rememberScrollState()) else Modifier)
         .fillMaxWidth()
+        .then(
+            if (!scrollable && node.actions.isNotEmpty()) {
+                Modifier.clickable { scope.dispatch(node.actions) }
+            } else {
+                Modifier
+            },
+        )
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(gap),
@@ -90,16 +97,22 @@ internal fun SpacerNode(node: SduiNode) {
 @Composable
 internal fun SectionNode(node: SduiNode, scope: SduiRenderScope) {
     val title = node.props.string("title")
+    val actionText = node.props.string("actionText")
     Column(
         modifier = node.style.toModifier().fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(spaceToken(node.style.gap ?: "space.sm")),
     ) {
         if (title.isNotEmpty()) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
-                modifier = Modifier.padding(horizontal = spaceToken("space.md")),
+            AppSectionHeader(
+                title = title,
+                titleVariant = appTextVariant(node.props.string("titleVariant", "title")),
+                actionText = actionText.ifEmpty { null },
+                actionVariant = node.props.string("actionVariant", "link"),
+                onAction = if (node.actions.isNotEmpty()) {
+                    { scope.dispatch(node.actions) }
+                } else {
+                    null
+                },
             )
         }
         SduiChildren(node, scope)
@@ -121,12 +134,18 @@ internal fun GridNode(node: SduiNode, scope: SduiRenderScope) {
     ) {
         node.children.chunked(columns).forEach { row ->
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(IntrinsicSize.Max),
                 horizontalArrangement = Arrangement.spacedBy(gap),
             ) {
                 row.forEach { child ->
-                    Box(Modifier.weight(1f)) {
-                        SduiNodeView(child, scope)
+                    Box(
+                        Modifier
+                            .weight(1f)
+                            .fillMaxHeight(),
+                    ) {
+                        SduiNodeView(child, scope, modifier = Modifier.fillMaxSize())
                     }
                 }
                 repeat(columns - row.size) {
@@ -160,104 +179,75 @@ internal fun CarouselNode(node: SduiNode, scope: SduiRenderScope) {
 @Composable
 internal fun TextNode(node: SduiNode, scope: SduiRenderScope) {
     val bound = node.bind["text"]?.let {
-        resolveBindText(it, scope.controller.state, scope.document.lookups)
+        resolveBindText(it, scope.nodeState, scope.document.lookups)
     }
     val text = bound ?: node.props.string("text")
-    val variant = node.props.string("variant", "body")
-    val style = when (variant) {
-        "title" -> MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold)
-        "caption" -> MaterialTheme.typography.bodySmall.copy(
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        "price" -> MaterialTheme.typography.titleLarge.copy(
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary,
-        )
-        else -> MaterialTheme.typography.bodyMedium
-    }
-    Text(text = text, style = style, modifier = node.style.toModifier())
+    AppText(
+        text = text,
+        variant = appTextVariant(node.props.string("variant", "body")),
+        modifier = node.style.toModifier(),
+        minLines = node.props.int("minLines", 1).coerceAtLeast(1),
+        maxLines = node.props.int("maxLines", Int.MAX_VALUE).coerceAtLeast(1),
+    )
 }
 
 @Composable
 internal fun ImageNode(node: SduiNode) {
-    val url = node.props.string("url")
-    val ratio = parseAspectRatio(node.props.string("aspectRatio", "16:9"))
-    AsyncImage(
-        model = url,
-        contentDescription = null,
-        contentScale = ContentScale.Crop,
-        modifier = node.style.toModifier()
-            .fillMaxWidth()
-            .aspectRatio(ratio)
-            .clip(RoundedCornerShape(8.dp)),
+    val scale = if (node.props.string("scale", "crop") == "fit") {
+        ContentScale.Fit
+    } else {
+        ContentScale.Crop
+    }
+    AppNetworkImage(
+        url = node.props.string("url"),
+        aspectRatio = parseAspectRatio(node.props.string("aspectRatio", "16:9")),
+        modifier = node.style.toModifier(),
+        contentScale = scale,
     )
 }
 
 @Composable
 internal fun IconNode(node: SduiNode) {
-    val name = node.props.string("name")
-    val image = when (name) {
-        "location" -> Icons.Filled.LocationOn
-        "search" -> Icons.Filled.Search
-        "chevron" -> Icons.Filled.KeyboardArrowDown
-        else -> Icons.Filled.Search
-    }
-    Icon(
-        imageVector = image,
-        contentDescription = name,
-        tint = MaterialTheme.colorScheme.primary,
-        modifier = node.style.toModifier().size(24.dp),
+    AppNamedIcon(
+        name = node.props.string("name"),
+        modifier = node.style.toModifier(),
     )
 }
 
 @Composable
 internal fun ButtonNode(node: SduiNode, scope: SduiRenderScope) {
-    val text = node.props.string("text")
-    val variant = node.props.string("variant", "primary")
-    val onClick = { scope.controller.dispatch(node.actions) }
-    val modifier = node.style.toModifier().fillMaxWidth()
-    when (variant) {
-        "secondary" -> OutlinedButton(onClick = onClick, modifier = modifier) { Text(text) }
-        "ghost" -> TextButton(onClick = onClick, modifier = modifier) { Text(text) }
-        else -> Button(onClick = onClick, modifier = modifier) { Text(text) }
-    }
+    AppActionButton(
+        text = node.props.string("text"),
+        variant = appButtonVariant(node.props.string("variant", "primary")),
+        onClick = { scope.dispatch(node.actions) },
+        modifier = node.style.toModifier(),
+    )
 }
 
 @Composable
 internal fun ChipNode(node: SduiNode, scope: SduiRenderScope) {
     val text = node.props.string("text")
     val selected = node.bind["selected"]?.let { expr ->
-        val actual = resolveBind(expr, scope.controller.state, scope.document.lookups)
+        val actual = resolveBind(expr, scope.nodeState, scope.document.lookups)
         jsonLooseEquals(actual, node.props.element("value"))
     } ?: false
-    FilterChip(
+    AppFilterChip(
+        text = text,
         selected = selected,
-        onClick = { scope.controller.dispatch(node.actions) },
-        label = { Text(text) },
+        onClick = { scope.dispatch(node.actions) },
         modifier = node.style.toModifier(),
+        variant = appChipVariant(node.props.string("variant", "filter")),
     )
 }
 
 @Composable
 internal fun SearchNode(node: SduiNode, scope: SduiRenderScope) {
-    val placeholder = node.props.string("placeholder", "Search")
-    Surface(
-        modifier = node.style.toModifier()
-            .fillMaxWidth()
-            .clickable { scope.controller.dispatch(node.actions) },
-        shape = RoundedCornerShape(12.dp),
-        color = MaterialTheme.colorScheme.surface,
-        tonalElevation = 1.dp,
-    ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            Icon(Icons.Filled.Search, contentDescription = null)
-            Text(placeholder, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        }
-    }
+    AppSearchBar(
+        placeholder = node.props.string("placeholder", "Search"),
+        onClick = { scope.dispatch(node.actions) },
+        modifier = node.style.toModifier(),
+        variant = appSearchVariant(node.props.string("variant", "default")),
+    )
 }
 
 @Composable
@@ -266,17 +256,22 @@ internal fun CardNode(node: SduiNode, scope: SduiRenderScope) {
         it != Color.Unspecified
     } ?: MaterialTheme.colorScheme.surface
     val colors = CardDefaults.cardColors(containerColor = container)
-    val modifier = node.style.toModifier().fillMaxWidth()
+    val modifier = node.style.toModifier().fillMaxWidth().fillMaxHeight()
     if (node.actions.isNotEmpty()) {
         Card(
-            onClick = { scope.controller.dispatch(node.actions) },
+            onClick = { scope.dispatch(node.actions) },
             modifier = modifier,
             colors = colors,
+            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         ) {
             SduiChildren(node, scope)
         }
     } else {
-        Card(modifier = modifier, colors = colors) {
+        Card(
+            modifier = modifier,
+            colors = colors,
+            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        ) {
             SduiChildren(node, scope)
         }
     }
@@ -322,12 +317,3 @@ internal fun FallbackNode(node: SduiNode) {
     }
 }
 
-private fun parseAspectRatio(value: String): Float {
-    val parts = value.split(":")
-    if (parts.size == 2) {
-        val w = parts[0].toFloatOrNull()
-        val h = parts[1].toFloatOrNull()
-        if (w != null && h != null && h != 0f) return w / h
-    }
-    return 16f / 9f
-}

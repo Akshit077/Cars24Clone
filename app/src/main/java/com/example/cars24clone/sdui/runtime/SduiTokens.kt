@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -14,6 +15,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.cars24clone.sdui.model.SduiStyle
+import com.example.cars24clone.ui.theme.CarsBadge
+import com.example.cars24clone.ui.theme.CarsBuyCard
+import com.example.cars24clone.ui.theme.CarsCream
+import com.example.cars24clone.ui.theme.CarsHero
+import com.example.cars24clone.ui.theme.CarsOrbit
+import com.example.cars24clone.ui.theme.CarsSellCard
 
 fun spaceToken(token: String?): Dp = when (token) {
     "space.xs" -> 4.dp
@@ -38,10 +45,16 @@ fun colorToken(token: String?): Color {
         "color.bg" -> colors.background
         "color.surface" -> colors.surface
         "color.primary" -> colors.primary
-        "color.onPrimary" -> colors.onPrimary
+        "color.hero" -> CarsHero
+        "color.onPrimary", "color.onHero" -> Color.White
         "color.text" -> colors.onBackground
         "color.muted" -> colors.onSurfaceVariant
         "color.border" -> colors.outline
+        "color.orbit" -> CarsOrbit
+        "color.buyCard" -> CarsBuyCard
+        "color.sellCard" -> CarsSellCard
+        "color.cream" -> CarsCream
+        "color.badge" -> CarsBadge
         else -> Color.Unspecified
     }
 }
@@ -49,13 +62,6 @@ fun colorToken(token: String?): Color {
 @Composable
 fun SduiStyle.toModifier(): Modifier {
     var modifier: Modifier = Modifier
-    padding?.let { modifier = modifier.padding(spaceToken(it)) }
-    if (paddingH != null || paddingV != null) {
-        modifier = modifier.padding(
-            horizontal = spaceToken(paddingH),
-            vertical = spaceToken(paddingV),
-        )
-    }
     val shape = if (corner != null) RoundedCornerShape(radiusToken(corner)) else null
     val background = colorToken(background)
     if (background != Color.Unspecified) {
@@ -66,6 +72,16 @@ fun SduiStyle.toModifier(): Modifier {
         }
     } else if (shape != null) {
         modifier = modifier.clip(shape)
+    }
+    if (insets == "statusBars") {
+        modifier = modifier.statusBarsPadding()
+    }
+    padding?.let { modifier = modifier.padding(spaceToken(it)) }
+    if (paddingH != null || paddingV != null) {
+        modifier = modifier.padding(
+            horizontal = spaceToken(paddingH),
+            vertical = spaceToken(paddingV),
+        )
     }
     when (width) {
         "fill" -> modifier = modifier.fillMaxWidth()
