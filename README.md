@@ -101,17 +101,9 @@ Overflow ⋮ (demo chrome, not schema):
 
 ## Recording (3–5 min)
 
+PFA, video recording for the entire workflow.
 https://drive.google.com/file/d/1DK1ouoxO489BCwfGaACLs0YSqjoNIle_/view?usp=drivesdk
 
-Talk while you tap. Do not open Static Home except to say it exists for perf.
-
-1. **JSON render (~45s).** SDUI · Home. Scroll. “This tree is `home.json`. A car tile is `card` + children, not `CarCard`.”
-2. **Tabs / chips (~30s).** All → Buy → back to All. “`setState` + `visibleIf`. No Kotlin `when (tab)`.”
-3. **Tenure + sheet (~60s).** Scroll to **Car loan EMI**. Tap 12 / 24 / 36 — price changes. “Lookup in JSON, not a `when` in Compose.” **Check eligibility** — sheet opens with the same bound EMI. Close.
-4. **Unknown fallback (~40s).** ⋮ → Unknown type. Pink `liveAuctionTicker`. Swift card still there. “Unknown `type` does not crash.”
-5. **Live JSON, no Kotlin (~60s).** Android Studio: `home.json`, change `"Search Swift"` to `"Search Baleno"` (or any string). Run the app again. **Do not edit `.kt` files.** Show the new placeholder. “Client code unchanged.”
-
-If time: ⋮ → Car detail — “same primitives, other page.”
 
 ## Docs
 
