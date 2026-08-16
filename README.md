@@ -101,6 +101,8 @@ Overflow ⋮ (demo chrome, not schema):
 
 ## Recording (3–5 min)
 
+https://drive.google.com/file/d/1DK1ouoxO489BCwfGaACLs0YSqjoNIle_/view?usp=drivesdk
+
 Talk while you tap. Do not open Static Home except to say it exists for perf.
 
 1. **JSON render (~45s).** SDUI · Home. Scroll. “This tree is `home.json`. A car tile is `card` + children, not `CarCard`.”
