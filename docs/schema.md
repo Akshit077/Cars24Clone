@@ -9,7 +9,7 @@ The client is a renderer. The server (here: a JSON file) owns layout, copy, and 
   "schemaVersion": 1,
   "minClientVersion": 1,
   "screen": { "id": "home", "title": "Cars24" },
-  "state": { "selectedCategory": "all", "tenureMonths": 24 },
+  "state": { "selectedTab": "all", "usedCarFilter": "recent", "tenureMonths": 24 },
   "lookups": { "emiByTenure": { "12": "₹8,499/mo", "24": "₹4,599/mo" } },
   "sheets": { "loanSheet": { "type": "column", "children": [] } },
   "root": { "type": "column", "children": [] }
@@ -36,7 +36,7 @@ Unknown keys at any level are ignored (`ignoreUnknownKeys`). That is the forward
   "props": { "itemWidth": 260 },
   "style": { "gap": "space.md", "paddingH": "space.md" },
   "bind": {},
-  "visibleIf": { "path": "state.selectedCategory", "eq": "suv" },
+  "visibleIf": { "path": "state.selectedTab", "eq": "buy" },
   "actions": [],
   "children": []
 }
@@ -59,14 +59,14 @@ Unknown `type` → visible fallback (label + type name). The page does not crash
 
 | type | props |
 |---|---|
-| `text` | `text`, `variant`: `title` \| `body` \| `caption` \| `price` |
-| `image` | `url`, `aspectRatio` (e.g. `16:9`) |
+| `text` | `text`, `variant`: `title` \| `body` \| `caption` \| `price` \| `onHero` \| `onHeroTitle`, optional `minLines` / `maxLines` |
+| `image` | `url`, `aspectRatio` (e.g. `16:9`), `scale`: `crop` \| `fit` |
 | `icon` | `name` (client icon set: `location`, `search`, `chevron`) |
-| `button` | `text`, `variant`: `primary` \| `secondary` \| `ghost` |
-| `chip` | `text`, `value` |
-| `search` | `placeholder` |
+| `button` | `text`, `variant`: `primary` \| `secondary` \| `ghost` \| `inverse` |
+| `chip` | `text`, `value`, `variant`: `filter` \| `tab` |
+| `search` | `placeholder`, `variant`: `default` \| `hero` |
 | `spacer` | `size` token |
-| `section` | `title` |
+| `section` | `title`, `titleVariant`, `actionText`, `actionVariant`: `link` \| `badge` |
 | `grid` | `columns` |
 | `carousel` | `itemWidth` (dp) |
 | `card` | — (chrome only; children do the work) |
@@ -75,11 +75,11 @@ Unknown `type` → visible fallback (label + type name). The page does not crash
 
 Do not sprinkle raw hex unless a token is missing.
 
-- Color: `color.bg`, `color.surface`, `color.primary`, `color.onPrimary`, `color.text`, `color.muted`, `color.border`
+- Color: `color.bg`, `color.surface`, `color.primary`, `color.onPrimary`, `color.text`, `color.muted`, `color.border`, `color.hero`, `color.onHero`, `color.orbit`, `color.buyCard`, `color.sellCard`, `color.cream`, `color.badge`
 - Space: `space.xs`, `space.sm`, `space.md`, `space.lg`, `space.xl`
 - Radius: `radius.sm`, `radius.md`, `radius.lg`
 
-Style fields: `padding`, `paddingH`, `paddingV`, `gap`, `background`, `corner`, `width`, `height`.
+Style fields: `padding`, `paddingH`, `paddingV`, `gap`, `background`, `corner`, `width`, `height`, `insets` (`statusBars`).
 
 ## Bind
 
@@ -106,9 +106,9 @@ No general expression language. If a surprise screen needs `min(a,b)`, that is a
 ## visibleIf
 
 ```json
-{ "path": "state.selectedCategory", "eq": "suv" }
-{ "path": "state.selectedCategory", "in": ["all", "suv"] }
-{ "path": "state.selectedCategory", "neq": "all" }
+{ "path": "state.selectedTab", "eq": "buy" }
+{ "path": "state.selectedTab", "in": ["all", "buy"] }
+{ "path": "state.selectedTab", "neq": "all" }
 ```
 
 Missing path → hide. Unknown operator → hide (safe default).

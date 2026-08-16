@@ -17,7 +17,7 @@ These exist before any renderer code on purpose. The assignment scores the brief
 | File | Scope |
 |---|---|
 | `.cursor/rules/sdui-invariants.mdc` | Always on: primitives only, JSON-driven actions, fallback, one stack |
-| `.cursor/rules/kotlin-sdui.mdc` | `**/*.kt` — package map, registry, dispatcher, Coil |
+| `.cursor/rules/kotlin-sdui.mdc` | `**/*.kt` — MVI, package map, registry, Coil |
 | `.cursor/rules/sdui-json-schema.mdc` | JSON / `schema.md` — document shape, actions, no page-specific types |
 | `.cursor/rules/assignment-docs.mdc` | Submission markdown honesty |
 
@@ -25,7 +25,7 @@ These exist before any renderer code on purpose. The assignment scores the brief
 
 1. Read the diff. Reject any new registry type whose name describes a Cars24 marketing section.
 2. Compile (`./gradlew :app:assembleDebug`) after dependency or source changes.
-3. Unit-test JSON decode + unknown-type fallback (no crash, fallback node present).
+3. Unit-test JSON decode, unknown-type preservation, and `SduiReducerTest` (intent → state/effect, no Compose).
 4. Manual: render `home.json`, flip a chip, open the sheet, load `home_unknown_type.json`.
 5. Perf numbers only from a **release** build on a real device. Do not accept model-invented timings.
 
@@ -70,31 +70,40 @@ These exist before any renderer code on purpose. The assignment scores the brief
 - **`HomeBanner` / `CarRail` / `CarCard` types.** Those would make the surprise screen a rewrite. Car tiles are `card` + children.
 - **Renderer / Compose home in this step.** Out of scope; schema first.
 
-### 3. SDUI engine (2026-08-15)
+### 3. SDUI engine, then MVI rewrite (2026-08-15)
 
-**Prompt (abridged):** Do the next step — registry, action bus, bind / visibleIf, visible unknown-type fallback, one screen that loads `home.json`. No hardcoded home composable.
+**Prompt 3a (abridged):** Do the next step — registry, action bus, bind / visibleIf, visible unknown-type fallback, one screen that loads `home.json`. No hardcoded home composable.
 
-**What the model produced:**
+**What the model produced first:**
 
-- `SduiRegistry` + primitive renderers, `SduiController` / `applyActions`, bind + `visibleIf`
-- `SduiScreen` + `SduiHostRoute` (payload menu is host chrome)
-- Coil `Application` ImageLoader so network images actually load
-- Unit tests for bind, setState, unknown action, registry membership
+- Registry + primitive renderers, bind / `visibleIf`, `applyActions`
+- **`SduiController`** with three `mutableStateOf` fields (`state`, `openSheetId`, `navigationUrl`) and `dispatch()` mutating them in place
+- `SduiHostRoute` owning payload + document + controller in `remember { }`
+- Coil `Application` ImageLoader
 
-**What I accepted:** Open props + string `type` registry. Lookup tables for EMI. Grid as a non-lazy row-chunk so it can sit inside a scrolling column. Snackbar stub for `navigate`.
+**What I accepted from 3a:** Primitive registry, lookup EMI, grid as row-chunks, snackbar for `navigate`, no `HomeScreen` composable.
 
-**What I rejected / rewrote:**
+**Prompt 3b (user correction):** Follow **MVI**. Keep a note of what was produced earlier and what was rewritten so the assignment’s three prompt→outcome stories stay honest.
 
-- **Hardcoded `HomeScreen` composable.** `MainActivity` only hosts `SduiHostRoute`.
-- **ViewModel fields named `tenureMonths` / `selectedCategory`.** State is a `JsonObject` the JSON writes.
-- **`Card(onClick = {})` when there are no actions.** That still consumes clicks; non-action cards use the non-clickable `Card` overload.
-- **Sealed action types.** Unknown actions no-op so a future `share` does not crash decode.
+**What I rejected / rewrote after 3b:**
+
+- **`SduiController` (deleted).** It mixed reduce + side effects + Compose snapshot state. Rotation / process death would drop JSON state; navigation lived on the same object as UI state; nothing was a testable `(state, intent) → state`.
+- **Host-local `remember` as the source of truth.** Payload switching and document load now go through `SduiIntent.SelectPayload` → ViewModel load → `DocumentLoaded`.
+- **Navigation as mutable state.** `navigate` is a one-shot `SduiEffect.ShowNavigation` on a `Channel`, not a field the view must remember to clear.
+
+**What shipped instead:** `SduiIntent` / `SduiUiState` / `SduiEffect` / `reduce()` / `SduiViewModel`. Leaves only call `scope.dispatch(actions)` → `ExecuteNodeActions`. `SduiReducerTest` covers setState+sheet, navigate-as-effect, dismiss, unknown action, load failure.
 
 ---
 
 ## One AI failure
 
-_(Fill the first time the model is wrong about schema, Compose APIs, or perf — and how it was caught. Do not invent one.)_
+**Where the model was wrong:** The first engine used `SduiController` — a Compose-aware mutable holder with `dispatch()` writing `state` / `openSheetId` / `navigationUrl` directly. That is MV-whatever, not MVI. It also stored navigation on the same object as document state, so the view had to `consumeNavigation()` after a snackbar.
+
+**How it was caught:** Review against the architecture we actually want (MVI) — called out in chat, not by a crash.
+
+**What changed:** Deleted `SduiController`. Intents in, pure `reduce()`, `StateFlow` out, effects on a `Channel`. The useful leftover from the failed design is `applyActions()` — it was already a pure JSON reducer and now sits inside `reduce()`.
+
+**How we verify:** `SduiReducerTest` (no Compose). Host only collects `state` and `effects`.
 
 ---
 
@@ -105,3 +114,10 @@ _(Fill the first time the model is wrong about schema, Compose APIs, or perf —
 | 2026-08-15 | Hour 0 setup on existing Android project | Deps, rules, this file, git init | Renderer / home UI (out of scope for this block) |
 | 2026-08-15 | Schema + sample JSON | Primitive contract, 3 payloads, parse models/tests | Sealed per-widget nodes; page-specific types; Compose UI |
 | 2026-08-15 | SDUI engine | Registry, actions, bind, fallback, JSON host | Hardcoded HomeScreen; page-specific ViewModel state |
+| 2026-08-15 | Follow MVI; log the rewrite | Intent / reduce / UiState / Effect / ViewModel | `SduiController` + `remember` as source of truth |
+| 2026-08-15 | Static twin + PERF skeleton | Shared `ui/components`, Static MVI, AppHost switch, PERF methodology | Duplicating Material3 leaves; inventing perf numbers |
+| 2026-08-15 | Restyle home from Cars24 screenshots | Tokenized hero/orbit/buy/sell colors; `home.json` tabs + sections; static twin match; overlay menu | New page-specific types (`HomeBanner`, `ShowroomCard`); hex in every node |
+| 2026-08-16 | Fix home layout from device screenshot | Status/nav padding on `SduiScreen`; equal grid cards; Orbit section title; reserved image boxes + `scale: fit` | Page-specific `ServiceTile` type; leaving broken Unsplash URLs |
+| 2026-08-16 | 6:30–7:30 static twin for honest overhead % | Shared leaves already in place; `PerfTrace` + `reportFullyDrawn`; catalog↔`home.json` parity test | Inventing PERF numbers; a second renderer; page-specific ViewModel fields |
+| 2026-08-16 | First Cars24Perf logcat paste | Wrote real cold trials into `PERF.md`; dropped 15–29 s same-PID lines | Treating SDUI 582 ms as “faster than static”; inventing a 5-trial median |
+| 2026-08-16 | 8:30–10:00 docs + recording script | README (choice, schema, versioning, trade-offs, 3–5 min script); `COVERAGE.md` | Inventing overhead %; claiming 95% of all future Cars24 pages |
