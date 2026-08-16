@@ -1,6 +1,8 @@
 package com.example.cars24clone.sdui.asset
 
 import android.content.Context
+import android.os.SystemClock
+import com.example.cars24clone.perf.PerfTrace
 import com.example.cars24clone.sdui.model.SduiDocument
 import com.example.cars24clone.sdui.model.SduiJson
 
@@ -12,5 +14,8 @@ enum class SduiPayload(val path: String, val label: String) {
 
 fun loadSduiDocument(context: Context, path: String): SduiDocument {
     val json = context.assets.open(path).bufferedReader().use { it.readText() }
-    return SduiJson.decodeFromString(SduiDocument.serializer(), json)
+    val started = SystemClock.elapsedRealtime()
+    val document = SduiJson.decodeFromString(SduiDocument.serializer(), json)
+    PerfTrace.recordParse(SystemClock.elapsedRealtime() - started)
+    return document
 }

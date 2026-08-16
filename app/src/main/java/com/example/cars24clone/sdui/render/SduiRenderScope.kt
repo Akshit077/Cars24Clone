@@ -5,17 +5,25 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
+import com.example.cars24clone.sdui.model.SduiAction
 import com.example.cars24clone.sdui.model.SduiDocument
 import com.example.cars24clone.sdui.model.SduiNode
+import com.example.cars24clone.sdui.mvi.SduiIntent
 import com.example.cars24clone.sdui.registry.SduiRegistry
-import com.example.cars24clone.sdui.runtime.SduiController
 import com.example.cars24clone.sdui.runtime.isVisible
+import kotlinx.serialization.json.JsonObject
 
 data class SduiRenderScope(
     val document: SduiDocument,
-    val controller: SduiController,
+    val nodeState: JsonObject,
     val registry: SduiRegistry,
-)
+    val onIntent: (SduiIntent) -> Unit,
+) {
+    fun dispatch(actions: List<SduiAction>) {
+        if (actions.isEmpty()) return
+        onIntent(SduiIntent.ExecuteNodeActions(actions))
+    }
+}
 
 internal val LocalSduiScrollable = staticCompositionLocalOf { false }
 
@@ -26,7 +34,7 @@ fun SduiNodeView(
     modifier: Modifier = Modifier,
     scrollable: Boolean = false,
 ) {
-    if (!isVisible(node.visibleIf, scope.controller.state, scope.document.lookups)) return
+    if (!isVisible(node.visibleIf, scope.nodeState, scope.document.lookups)) return
     CompositionLocalProvider(LocalSduiScrollable provides scrollable) {
         Box(modifier) {
             scope.registry.Render(node, scope)
